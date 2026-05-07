@@ -1,7 +1,9 @@
+using System.Collections;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public int health = 100;
     public float playerSpeed = 5f;
     public float jumpForce = 10f;
     public Transform groundCheck;
@@ -12,8 +14,11 @@ public class Player : MonoBehaviour
     private bool isGrounded;
 
     private Animator animator;
-    
-    
+
+    private SpriteRenderer spriteRenderer;
+
+    public int extraJumpsValue = 0;
+    private int extraJumps;
     
     
     
@@ -23,6 +28,9 @@ public class Player : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+
+        extraJumps = extraJumpsValue;
     }
 
   
@@ -30,6 +38,11 @@ public class Player : MonoBehaviour
     {
         float moveInput = Input.GetAxis("Horizontal");
         rb.linearVelocity = new Vector2(moveInput * playerSpeed, rb.linearVelocity.y);
+
+        if (isGrounded)
+        {
+            extraJumps = extraJumpsValue;
+        }
 
         if (moveInput > 0) 
         {
@@ -40,10 +53,17 @@ public class Player : MonoBehaviour
             transform.localScale = new Vector3(-1, 1, 1);
         }
         
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            if(isGrounded)
+            { 
+               rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            }
+            else if (extraJumps > 0)
+            {
+               rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+               extraJumps--;
+            }
         }
 
         SetAnimation(moveInput);
@@ -82,4 +102,37 @@ public class Player : MonoBehaviour
         }
 
     }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Damage")
+        {
+            health -= 25;
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            StartCoroutine(BlinkRed());
+
+            if(health < 0)
+            {
+                Die();
+            }
+        }
+    }
+    private IEnumerator BlinkRed()
+    
+     {
+        spriteRenderer.color = Color.red;
+        yield return new WaitForSeconds(0.1f);
+        spriteRenderer.color = Color.white;
+     }
+
+     private void Die()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene");
+    }
+
+    
+    public void EnableDoubleJump()
+   {
+        extraJumpsValue = 1;
+        Debug.Log("Double jump ability unlocked");
+   }
 }
