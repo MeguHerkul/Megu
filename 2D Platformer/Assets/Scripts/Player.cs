@@ -10,9 +10,19 @@ public class Player : MonoBehaviour
 
     private Rigidbody2D rb;
     private bool isGrounded;
+
+    private Animator animator;
+    
+    
+    
+    
+    
+    
+    
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
     }
 
   
@@ -21,11 +31,11 @@ public class Player : MonoBehaviour
         float moveInput = Input.GetAxis("Horizontal");
         rb.linearVelocity = new Vector2(moveInput * playerSpeed, rb.linearVelocity.y);
 
-        if (moveInput > 0) // Saða basýlýyorsa
+        if (moveInput > 0) 
         {
             transform.localScale = new Vector3(1, 1, 1);
         }
-        else if (moveInput < 0) // Sola basýlýyorsa
+        else if (moveInput < 0) 
         {
             transform.localScale = new Vector3(-1, 1, 1);
         }
@@ -34,7 +44,9 @@ public class Player : MonoBehaviour
 
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-        }       
+        }
+
+        SetAnimation(moveInput);
     }
 
     private void FixedUpdate()
@@ -43,5 +55,31 @@ public class Player : MonoBehaviour
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
     }
 
+    private void SetAnimation(float moveInput)
+    {
+        if (isGrounded)
+        {
+            if (moveInput == 0)
+            {
+                animator.Play("Player_Idle");
+            }
+            else
+            {
+                animator.Play("Player_Run");
+            }
+        
+        }
+        else
+        {
+            if(rb.linearVelocityY > 0)
+            {
+                animator.Play("Player_Jump");
+            }
+            else
+            {
+                animator.Play("Player_Fall");
+            }
+        }
 
+    }
 }
