@@ -571,7 +571,7 @@ MonoBehaviour:
   hasDashAbility: 0
   wallCheckDistance: 1
   wallSlideSpeed: 2
-  wallJumpForce: {x: 10, y: 15}
+  wallJumpForce: {x: 5, y: 10}
   wallJumpDuration: 0.2
   extraJumpsValue: 0
 --- !u!95 &187812763
@@ -610,7 +610,7 @@ GameObject:
   - component: {fileID: 337254049}
   m_Layer: 6
   m_Name: Container
-  m_TagString: Untagged
+  m_TagString: Platform
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

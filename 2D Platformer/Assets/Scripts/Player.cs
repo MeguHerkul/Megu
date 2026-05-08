@@ -132,7 +132,6 @@ public class Player : MonoBehaviour
     {
         canDash = false;
         isDashing = true;
-        
         transform.SetParent(null);
         
         float originalGravity = rb.gravityScale;
@@ -189,8 +188,19 @@ public class Player : MonoBehaviour
 
             if (health <= 0)
             {
-                Die();
+                StartCoroutine(DieSafe());
             }
+        }
+        if (collision.gameObject.CompareTag("Platform"))
+        {
+            transform.SetParent(collision.transform);
+        }
+    }
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Platform"))
+        {
+            transform.SetParent(null);
         }
     }
 
@@ -201,12 +211,13 @@ public class Player : MonoBehaviour
         spriteRenderer.color = Color.white;
     }
 
-    private void Die()
+    private IEnumerator DieSafe()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene");
+        transform.SetParent(null); 
+        yield return null; 
+        SceneManager.LoadScene("GameScene");
     }
 
-    
     public void EnableDoubleJump()
    {
         extraJumpsValue = 1;
