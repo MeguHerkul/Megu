@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public int health = 100;
+    public int health = 99;
     public float playerSpeed = 5f;
     public float jumpForce = 10f;
     public Transform groundCheck;
@@ -106,11 +106,12 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.tag == "Damage")
         {
-            health -= 25;
+            health -= 34;
+              
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             StartCoroutine(BlinkRed());
 
-            if(health < 0)
+            if(health <= 0)
             {
                 Die();
             }
