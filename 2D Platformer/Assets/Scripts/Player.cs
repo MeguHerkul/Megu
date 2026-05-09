@@ -200,10 +200,17 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Platform"))
         {
-            transform.SetParent(null);
+           
+            if (collision.gameObject.activeInHierarchy)
+            {
+                transform.SetParent(null);
+            }
+            else
+            {                
+                transform.parent = null;
+            }
         }
     }
-
     private IEnumerator BlinkRed()
     {
         spriteRenderer.color = Color.red;
