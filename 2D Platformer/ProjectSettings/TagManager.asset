@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Damage
   - Platform
+  - Background
   layers:
   - Default
   - TransparentFX

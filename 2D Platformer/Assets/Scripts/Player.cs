@@ -18,19 +18,18 @@ public class Player : MonoBehaviour
     public float dashCooldown = 1f;
     private bool canDash = true;
     private bool isDashing;
-
     public bool hasDashAbility = false;
 
     [Header("Wall Mechanics")]
     public float wallCheckDistance = 0.45f;
     public float wallSlideSpeed = 2f;
-
     public Vector2 wallJumpForce = new Vector2(10f, 15f); 
     public float wallJumpDuration = 0.2f; 
     private bool isWallJumping;
-
     private bool isTouchingWall;
     private bool isWallSliding;
+    public bool hasWallAbility = false; 
+    private float lastWallJumpSide; 
 
     private Rigidbody2D rb;
     private bool isGrounded;
@@ -68,6 +67,7 @@ public class Player : MonoBehaviour
         if (isGrounded)
         {
             extraJumps = extraJumpsValue;
+            lastWallJumpSide = 0;
         }
 
         if (moveInput > 0) 
@@ -100,9 +100,15 @@ public class Player : MonoBehaviour
         {
             StartCoroutine(Dash());
         }
-       
-        HandleWallSlide(moveInput);
-        
+        if (hasWallAbility)
+        {
+            HandleWallSlide(moveInput);
+        }
+        else
+        {
+            isWallSliding = false;
+        }
+
         SetAnimation(moveInput);
     }
 
@@ -115,6 +121,9 @@ public class Player : MonoBehaviour
 
     private IEnumerator WallJump()
     {
+        float currentWallSide = transform.localScale.x;
+        if (currentWallSide == lastWallJumpSide) yield break;
+
         isWallJumping = true;
         isWallSliding = false;
 
@@ -123,6 +132,8 @@ public class Player : MonoBehaviour
         float jumpDirection = -transform.localScale.x;
         rb.linearVelocity = new Vector2(wallJumpForce.x * jumpDirection, wallJumpForce.y);
         transform.localScale = new Vector3(jumpDirection, 1, 1);
+
+        lastWallJumpSide = currentWallSide;
 
         yield return new WaitForSeconds(wallJumpDuration);
         isWallJumping = false;
@@ -235,6 +246,12 @@ public class Player : MonoBehaviour
     {
         hasDashAbility = true;
         Debug.Log("Dash ability unlocked");
+    }
+
+    public void EnableWallAbilities()
+    {
+        hasWallAbility = true;
+        Debug.Log("Wall Slide and Wall Jump unlocked!");
     }
 
     private void HandleWallSlide(float moveInput)

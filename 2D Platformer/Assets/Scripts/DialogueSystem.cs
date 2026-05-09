@@ -51,14 +51,14 @@ public class DialogueSystem : MonoBehaviour
         hasTalked = true;
         index = 0;
 
-        // Karakteri durdur ve Idle animasyonuna geçir
+        
         Rigidbody2D rb = playerObj.GetComponent<Rigidbody2D>();
         if (rb != null) rb.linearVelocity = Vector2.zero;
 
         Animator playerAnim = playerObj.GetComponent<Animator>();
         if (playerAnim != null) playerAnim.Play("Player_Idle");
 
-        // TÜCCARI KONUÞTUR (Doðrudan isimle çaðýrýyoruz, ok gerekmez)
+        
         Animator merchantAnim = GetComponent<Animator>();
         if (merchantAnim != null)
         {
@@ -87,7 +87,7 @@ public class DialogueSystem : MonoBehaviour
             dialoguePanel.SetActive(false);
             isTalking = false;
 
-            // TÜCCARI SUSTUR (Doðrudan isimle çaðýrýyoruz)
+            
             Animator merchantAnim = GetComponent<Animator>();
             if (merchantAnim != null)
             {
