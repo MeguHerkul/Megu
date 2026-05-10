@@ -12,6 +12,11 @@ public class Player : MonoBehaviour
     public float groundCheckRadius = 0.2f;
     public LayerMask groundLayer;
 
+    [Header("Audio)")]
+    public AudioClip jumpClip; 
+    public AudioClip dashClip; 
+    private AudioSource audioSource; 
+
     [Header("Coyote Time")]
     public float coyoteTime = 0.15f;
     private float coyoteTimeCounter;
@@ -51,9 +56,12 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        extraJumps = extraJumpsValue;
 
         
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+
+        extraJumps = extraJumpsValue;
         checkpointPos = transform.position;
 
         for (int i = 0; i < hearts.Length; i++) hearts[i].SetActive(i < health);
@@ -89,25 +97,51 @@ public class Player : MonoBehaviour
         {
             if (isWallSliding)
             {
+                PlayJumpSound();
                 StartCoroutine(WallJump());
             }
             else if (coyoteTimeCounter > 0f)
             {
+                PlayJumpSound();
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
                 coyoteTimeCounter = 0f;
             }
             else if (extraJumps > 0)
             {
+                PlayJumpSound();
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
                 extraJumps--;
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftShift) && canDash && hasDashAbility) StartCoroutine(Dash());
+        if (Input.GetKeyDown(KeyCode.LeftShift) && canDash && hasDashAbility)
+        {
+            PlayDashSound(); 
+            StartCoroutine(Dash());
+        }
+
         if (hasWallAbility) HandleWallSlide(moveInput);
         else isWallSliding = false;
 
         SetAnimation(moveInput);
+    }
+
+    private void PlayJumpSound()
+    {
+        if (jumpClip != null && audioSource != null)
+        {
+            audioSource.pitch = Random.Range(0.9f, 1.1f);
+            audioSource.PlayOneShot(jumpClip);
+        }
+    }
+
+    private void PlayDashSound()
+    {
+        if (dashClip != null && audioSource != null)
+        {
+            audioSource.pitch = 1f; 
+            audioSource.PlayOneShot(dashClip);
+        }
     }
 
     private void FixedUpdate()
@@ -133,10 +167,7 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Damage"))
-        {
-            TakeDamage();
-        }
+        if (collision.gameObject.CompareTag("Damage")) TakeDamage();
         if (collision.gameObject.CompareTag("Platform")) transform.SetParent(collision.transform);
     }
 
@@ -151,23 +182,16 @@ public class Player : MonoBehaviour
         health--;
         for (int i = 0; i < hearts.Length; i++) hearts[i].SetActive(i < health);
 
-        if (health <= 0)
-        {
-            StartCoroutine(DieSafe());
-        }
+        if (health <= 0) StartCoroutine(DieSafe());
         else
         {
-            
             transform.position = checkpointPos;
             rb.linearVelocity = Vector2.zero;
             StartCoroutine(BlinkRed());
         }
     }
 
-    public void UpdateCheckpoint(Vector2 newPos)
-    {
-        checkpointPos = newPos;
-    }
+    public void UpdateCheckpoint(Vector2 newPos) { checkpointPos = newPos; }
 
     private IEnumerator Dash() { canDash = false; isDashing = true; transform.SetParent(null); float origGrav = rb.gravityScale; rb.gravityScale = 0f; rb.linearVelocity = new Vector2(transform.localScale.x * dashForce, 0f); yield return new WaitForSeconds(dashDuration); rb.gravityScale = origGrav; isDashing = false; yield return new WaitForSeconds(dashCooldown); canDash = true; }
     private IEnumerator DieSafe() { transform.SetParent(null); yield return null; SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
