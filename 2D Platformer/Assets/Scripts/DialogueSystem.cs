@@ -4,11 +4,16 @@ using System.Collections;
 
 public class DialogueSystem : MonoBehaviour
 {
-    [Header("UI Ayarlarý")]
+    public enum AbilityToUnlock { WallAbilities, Dash, DoubleJump, None }
+
+    [Header("Ability Settings")]
+    public AbilityToUnlock abilityType = AbilityToUnlock.None;
+
+    [Header("UI Settings")]
     public GameObject dialoguePanel;
     public TextMeshProUGUI textDisplay;
 
-    [Header("Diyalog Ayarlarý")]
+    [Header("Dialogue Settings")]
     [TextArea(3, 10)]
     public string[] sentences;
     public float typingSpeed = 0.05f;
@@ -96,8 +101,28 @@ public class DialogueSystem : MonoBehaviour
 
             if (playerObj.GetComponent<Player>() != null)
             {
+                UnlockAbility(playerObj.GetComponent<Player>());
+
                 playerObj.GetComponent<Player>().enabled = true;
             }
+        }
+    }
+
+    private void UnlockAbility(Player player)
+    {
+        switch (abilityType)
+        {
+            case AbilityToUnlock.WallAbilities:
+                player.EnableWallAbilities();
+                break;
+            case AbilityToUnlock.Dash:
+                player.EnableDash();
+                break;
+            case AbilityToUnlock.DoubleJump:
+                player.EnableDoubleJump();
+                break;
+            case AbilityToUnlock.None:
+                break;
         }
     }
 
