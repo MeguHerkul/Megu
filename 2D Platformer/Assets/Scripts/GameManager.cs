@@ -51,7 +51,7 @@ public class GameManager : MonoBehaviour
         if (resultText != null)
         {
             resultText.text = "CONGRATULATIONS!\n" +
-                              "YOU FINISHED THE GAME\n\n" +
+                              "YOU FINISHED THE ASPEN\n\n" +
                               "FINAL TIME: " + string.Format("{0:00}:{1:00}", minutes, seconds) + "\n\n" +
                               "<size=60%>Press 'R' to Restart</size>";
         }

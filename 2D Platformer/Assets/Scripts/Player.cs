@@ -13,8 +13,11 @@ public class Player : MonoBehaviour
     public LayerMask groundLayer;
 
     [Header("Coyote Time")]
-    public float coyoteTime = 0.15f; 
+    public float coyoteTime = 0.15f;
     private float coyoteTimeCounter;
+
+    [Header("Checkpoint System")]
+    private Vector2 checkpointPos;
 
     [Header("Dash")]
     public float dashForce = 20f;
@@ -49,6 +52,10 @@ public class Player : MonoBehaviour
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         extraJumps = extraJumpsValue;
+
+        
+        checkpointPos = transform.position;
+
         for (int i = 0; i < hearts.Length; i++) hearts[i].SetActive(i < health);
     }
 
@@ -59,16 +66,15 @@ public class Player : MonoBehaviour
         float moveInput = Input.GetAxis("Horizontal");
         rb.linearVelocity = new Vector2(moveInput * playerSpeed, rb.linearVelocity.y);
 
-        
         if (isGrounded)
         {
-            coyoteTimeCounter = coyoteTime; 
+            coyoteTimeCounter = coyoteTime;
             extraJumps = extraJumpsValue;
             lastWallJumpSide = 0;
         }
         else
         {
-            coyoteTimeCounter -= Time.deltaTime; 
+            coyoteTimeCounter -= Time.deltaTime;
         }
 
         if (isTouchingWall && hasWallAbility && transform.localScale.x != lastWallJumpSide)
@@ -79,17 +85,16 @@ public class Player : MonoBehaviour
         if (moveInput > 0) transform.localScale = new Vector3(1, 1, 1);
         else if (moveInput < 0) transform.localScale = new Vector3(-1, 1, 1);
 
-        
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (isWallSliding)
             {
                 StartCoroutine(WallJump());
             }
-            else if (coyoteTimeCounter > 0f) 
+            else if (coyoteTimeCounter > 0f)
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-                coyoteTimeCounter = 0f; 
+                coyoteTimeCounter = 0f;
             }
             else if (extraJumps > 0)
             {
@@ -130,12 +135,7 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Damage"))
         {
-            transform.SetParent(null);
-            health--;
-            for (int i = 0; i < hearts.Length; i++) hearts[i].SetActive(i < health);
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-            StartCoroutine(BlinkRed());
-            if (health <= 0) StartCoroutine(DieSafe());
+            TakeDamage();
         }
         if (collision.gameObject.CompareTag("Platform")) transform.SetParent(collision.transform);
     }
@@ -145,10 +145,35 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("Platform")) transform.SetParent(null);
     }
 
+    public void TakeDamage()
+    {
+        transform.SetParent(null);
+        health--;
+        for (int i = 0; i < hearts.Length; i++) hearts[i].SetActive(i < health);
+
+        if (health <= 0)
+        {
+            StartCoroutine(DieSafe());
+        }
+        else
+        {
+            
+            transform.position = checkpointPos;
+            rb.linearVelocity = Vector2.zero;
+            StartCoroutine(BlinkRed());
+        }
+    }
+
+    public void UpdateCheckpoint(Vector2 newPos)
+    {
+        checkpointPos = newPos;
+    }
+
     private IEnumerator Dash() { canDash = false; isDashing = true; transform.SetParent(null); float origGrav = rb.gravityScale; rb.gravityScale = 0f; rb.linearVelocity = new Vector2(transform.localScale.x * dashForce, 0f); yield return new WaitForSeconds(dashDuration); rb.gravityScale = origGrav; isDashing = false; yield return new WaitForSeconds(dashCooldown); canDash = true; }
     private IEnumerator DieSafe() { transform.SetParent(null); yield return null; SceneManager.LoadScene(SceneManager.GetActiveScene().name); }
     private void SetAnimation(float moveInput) { if (isGrounded) { if (moveInput == 0) animator.Play("Player_Idle"); else animator.Play("Player_Run"); } else { if (isWallSliding) animator.Play("Wall_Slide"); else if (rb.linearVelocityY > 0) animator.Play("Player_Jump"); else animator.Play("Player_Fall"); } }
     private IEnumerator BlinkRed() { spriteRenderer.color = Color.red; yield return new WaitForSeconds(0.1f); spriteRenderer.color = Color.white; }
+
     public void EnableDoubleJump() { extraJumpsValue = 1; }
     public void EnableDash() { hasDashAbility = true; }
     public void EnableWallAbilities() { hasWallAbility = true; }
