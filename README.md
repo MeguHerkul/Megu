@@ -5,9 +5,11 @@
 ASPEN is a 2D linear platformer game where the player moves along a straight path, overcomes obstacles, and interacts with NPCs. 
 By talking to NPCs encountered along the way, the player unlocks new movement abilities to overcome the upcoming platforming challenges. The core focus is on smooth progression through a structured, linear level.
 
+
 -Core Loop
 
 Player moves forward along the path → overcomes platforming challenges → interacts with NPCs to unlock new abilities → uses newly acquired moves to complete the remaining challenges → repeat.
+
 
 -Win & Lose Conditions
  
@@ -15,11 +17,13 @@ Player moves forward along the path → overcomes platforming challenges → int
  
  Lose Condition: Losing a single heart respawns the player back at the last checkpoint. However, losing all 3 hearts results in a permanent game over, restarting the entire game from the beginning.
 
+
 -Scenes
 
 MainMenu: The initial screen that allows the player to start or exit the game.
 
 GameScene: The main playable area containing the linear level design, enemies, checkpoints, and NPCs.
+
 
 -Controls
 
