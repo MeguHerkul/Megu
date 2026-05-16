@@ -16,7 +16,9 @@ Player moves forward along the path → overcomes platforming challenges → int
  Lose Condition: Losing a single heart respawns the player back at the last checkpoint. However, losing all 3 hearts results in a permanent game over, restarting the entire game from the beginning.
 
 -Scenes
+
 MainMenu: The initial screen that allows the player to start or exit the game.
+
 GameScene: The main playable area containing the linear level design, enemies, checkpoints, and NPCs.
 
 -Controls
